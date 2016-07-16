@@ -23,8 +23,10 @@ defmodule ArtaroundImport do
 				:title => row["Titre"],
 				:position => %{
 					:lat => String.strip(row["CoordonneeLatitude"]),
-					:lon => String.strip(row["CoordonneeLongitude"]),
-				}
+					:lon => String.strip(row["CoordonneeLongitude"])
+				},
+				:category => row["SousCategorieObjet"],
+				:materials => extract_materials(row["Materiaux"])
 			}
 			cleaned
 		end)
@@ -33,6 +35,14 @@ defmodule ArtaroundImport do
 		File.write!("export.json", json_file, [])
 	end
 
+	def extract_materials(nil) do
+		[]
+	end
+	
+	def extract_materials(materials) do
+		Enum.map(String.split(materials, ";"), fn material -> String.strip(material) end)
+	end
+	
 	defp parse_args(args) do
 		{options, _, _} = OptionParser.parse(args,
 			switches: [path: :string]
